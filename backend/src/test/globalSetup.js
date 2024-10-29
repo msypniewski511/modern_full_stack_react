@@ -8,4 +8,5 @@ export default async function globalSetup() {
   })
   global.__MONGOINSTANCE = instance
   process.env.DATABASE_URL = instance.getUri()
+  process.env.JWT_SECRET = 'your_generated_secret_key'
 }

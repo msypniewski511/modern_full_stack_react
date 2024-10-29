@@ -4,9 +4,6 @@ import { describe, expect, test, beforeEach, jest } from '@jest/globals'
 import { User } from '../../db/models/user.js'
 import { createUser, loginUser } from '../../services/users.js'
 
-jest.mock('bcrypt')
-jest.mock('jsonwebtoken')
-
 describe('User Service', () => {
   beforeEach(() => {
     jest.clearAllMocks()
