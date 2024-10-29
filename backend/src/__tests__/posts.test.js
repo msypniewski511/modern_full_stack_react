@@ -11,7 +11,6 @@ import {
 } from '../services/posts.js'
 import { createTestUser } from '../test/helper.js'
 import { Post } from '../db/models/post.js'
-import { User } from '../db/models/user.js'
 
 let userId
 
@@ -120,9 +119,6 @@ describe('listing posts', () => {
   })
 
   test('should be able to filter posts by author', async () => {
-    const user = await User.findOne({ username: 'Daniel Bugl' })
-    const author = user._id
-    console.log(author)
     const posts = await listPostsByAuthor('6720ea18eb823b80f1084c87')
     expect(posts.length).toBe(3)
   })
