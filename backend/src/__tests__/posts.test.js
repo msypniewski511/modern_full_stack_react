@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { describe, expect, test, beforeEach } from '@jest/globals'
+import { describe, expect, test, beforeEach, beforeAll } from '@jest/globals'
 import {
   createPost,
   listAllPosts,
@@ -9,13 +9,21 @@ import {
   updatePost,
   deletePost,
 } from '../services/posts.js'
+import { createTestUser } from '../test/helper.js'
 import { Post } from '../db/models/post.js'
+import { User } from '../db/models/user.js'
+
+let userId
+
+beforeAll(async () => {
+  userId = await createTestUser()
+})
 
 describe('creating posts', () => {
   test('with all parameters should succeed', async () => {
     const post = {
       title: 'Hello Mongoose!',
-      author: 'Daniel Bugl',
+      author: userId,
       contents: 'This post is stored in a MongoDB database using Mongoose.',
       tags: ['mongoose', 'mongodb'],
     }
@@ -29,7 +37,7 @@ describe('creating posts', () => {
 
   test('without title should fail', async () => {
     const post = {
-      author: 'Daniel Bugl',
+      author: userId,
       contents: 'Post with no title',
       tags: ['empty'],
     }
@@ -44,25 +52,35 @@ describe('creating posts', () => {
   test('with minimal parameters should succeed', async () => {
     const post = {
       title: 'Only a title',
+      author: userId,
     }
     const createdPost = await createPost(post)
     expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
   })
 })
 
+const tmp = '6720ea18eb823b80f1084c87'
+
 const samplePosts = [
-  { title: 'Learning Redux', author: 'Daniel Bugl', tags: ['redux'] },
-  { title: 'Learn React Hooks', author: 'Daniel Bugl', tags: ['react'] },
+  {
+    title: 'Learning Redux',
+    author: tmp,
+    tags: ['redux'],
+  },
+  {
+    title: 'Learn React Hooks',
+    author: tmp,
+    tags: ['react'],
+  },
   {
     title: 'Full-Stack React Projects',
-    author: 'Daniel Bugl',
+    author: tmp,
     tags: ['react', 'nodejs'],
   },
-  { title: 'Guide to TypeScript' },
+  { title: 'Guide to TypeScript', author: '6720ea18eb823b80f1084c85' },
 ]
 
 let createdSamplePosts = []
-
 beforeEach(async () => {
   await Post.deleteMany({})
   createdSamplePosts = []
@@ -102,7 +120,10 @@ describe('listing posts', () => {
   })
 
   test('should be able to filter posts by author', async () => {
-    const posts = await listPostsByAuthor('Daniel Bugl')
+    const user = await User.findOne({ username: 'Daniel Bugl' })
+    const author = user._id
+    console.log(author)
+    const posts = await listPostsByAuthor('6720ea18eb823b80f1084c87')
     expect(posts.length).toBe(3)
   })
 
@@ -127,15 +148,15 @@ describe('getting a post', () => {
 describe('updating posts', () => {
   test('should update the specified property', async () => {
     await updatePost(createdSamplePosts[0]._id, {
-      author: 'Test Author',
+      title: 'Test Author',
     })
     const updatedPost = await Post.findById(createdSamplePosts[0]._id)
-    expect(updatedPost.author).toEqual('Test Author')
+    expect(updatedPost.title).toEqual('Test Author')
   })
 
   test('should not update other properties', async () => {
     await updatePost(createdSamplePosts[0]._id, {
-      author: 'Test Author',
+      contents: 'Test Author',
     })
     const updatedPost = await Post.findById(createdSamplePosts[0]._id)
     expect(updatedPost.title).toEqual('Learning Redux')
@@ -143,7 +164,7 @@ describe('updating posts', () => {
 
   test('should update the updatedAt timestamp', async () => {
     await updatePost(createdSamplePosts[0]._id, {
-      author: 'Test Author',
+      title: 'Test Author',
     })
     const updatedPost = await Post.findById(createdSamplePosts[0]._id)
     expect(updatedPost.updatedAt.getTime()).toBeGreaterThan(
@@ -153,7 +174,7 @@ describe('updating posts', () => {
 
   test('should fail if the id does not exist', async () => {
     const post = await updatePost('000000000000000000000000', {
-      author: 'Test Author',
+      title: 'Test Author',
     })
     expect(post).toEqual(null)
   })
