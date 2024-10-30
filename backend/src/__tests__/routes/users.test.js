@@ -8,6 +8,16 @@ const app = express()
 app.use(express.json())
 userRoutes(app)
 
+beforeEach(async () => {
+  // Clear database before each test
+  await User.deleteMany({});
+});
+
+afterAll(async () => {
+  // Close mongoose connection after tests
+  await mongoose.connection.close();
+});
+
 describe('User Routes', () => {
   describe('POST /api/v1/user/signup', () => {
     it('should create a new user and return the username', async () => {
