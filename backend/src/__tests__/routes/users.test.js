@@ -1,7 +1,8 @@
 import request from 'supertest'
 import express from 'express'
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterAll } from '@jest/globals'
 import { userRoutes } from '../../routes/users.js'
+import { User }  from '../../db/models/user.js';
 
 // Create a new Express application
 const app = express()
@@ -15,8 +16,9 @@ beforeEach(async () => {
 
 afterAll(async () => {
   // Close mongoose connection after tests
-  await mongoose.connection.close();
+  // await mongoose.connection.close();
 });
+
 describe('User Routes', () => {
   describe('POST /api/v1/user/signup', () => {
     it('should create a new user and return the username', async () => {
@@ -26,7 +28,7 @@ describe('User Routes', () => {
         .post('/api/v1/user/signup')
         .send(mockUser)
 
-      expect(response.status).toBe(400)
+      expect(response.status).toBe(201)
       expect(response.body).toEqual({ username: 'testuser' })
     })
 
