@@ -55,7 +55,7 @@ describe('User Routes', () => {
     })
 
     it('should return 400 for general errors', async () => {
-      const mockUser = { username: 'testuser', password: 'short' } // Assuming your validation checks for password length
+      const mockUser = { username: 'testuser', password: 'password123456' } // Assuming your validation checks for password length
 
       const response = await request(app)
         .post('/api/v1/user/signup')
