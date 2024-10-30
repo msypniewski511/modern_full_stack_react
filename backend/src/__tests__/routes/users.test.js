@@ -1,6 +1,6 @@
 import request from 'supertest'
 import express from 'express'
-import { describe, it, expect, beforeEach, afterAll } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterAll, beforeAll } from '@jest/globals'
 import { userRoutes } from '../../routes/users.js'
 import { User }  from '../../db/models/user.js';
 
