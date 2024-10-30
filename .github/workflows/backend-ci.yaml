@@ -27,4 +27,6 @@ jobs:
       - name: Run linter on backend
         run: npm run lint
       - name: Run backend tests
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}  # Add this to your GitHub secrets
         run: npm test
