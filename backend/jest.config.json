@@ -1,6 +1,19 @@
 {
+  "transform": {
+    "^.+\\.jsx?$": "babel-jest"
+  },
   "testEnvironment": "node",
+  "moduleFileExtensions": ["js", "jsx", "ts", "tsx", "json", "node"],
+  "globals": {
+    "ts-jest": {
+      "useESM": true
+    }
+  },
   "globalSetup": "<rootDir>/src/test/globalSetup.js",
   "globalTeardown": "<rootDir>/src/test/globalTeardown.js",
-  "setupFilesAfterEnv": ["<rootDir>/src/test/setupFileAfterEnv.js"]
+  "setupFilesAfterEnv": [
+    "<rootDir>/src/test/setupFileAfterEnv.js",
+    "<rootDir>/src/test/jest.setup.js"
+  ],
+  "testMatch": ["**/__tests__/**/*.test.js"]
 }
