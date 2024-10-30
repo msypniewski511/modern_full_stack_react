@@ -1,6 +1,6 @@
 import request from 'supertest'
 import express from 'express'
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterAll } from '@jest/globals'
 import { userRoutes } from '../../routes/users.js'
 
 // Create a new Express application
@@ -15,7 +15,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   // Close mongoose connection after tests
-  await mongoose.connection.close();
+  // await mongoose.connection.close();
 });
 
 describe('User Routes', () => {
