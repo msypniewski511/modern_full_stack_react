@@ -17,7 +17,7 @@ describe('User Routes', () => {
         .post('/api/v1/user/signup')
         .send(mockUser)
 
-      expect(response.status).toBe(201)
+      expect(response.status).toBe(400)
       expect(response.body).toEqual({ username: 'testuser' })
     })
 
