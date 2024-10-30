@@ -1,4 +1,4 @@
-# Modern Full-Stack React Projects / Chapter 5 / Backend
+# Modern Full-Stack React Projects
 
 _Deploying the Application with Docker and CI/CD_
 
