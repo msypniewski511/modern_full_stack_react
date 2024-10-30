@@ -2,7 +2,7 @@ import request from 'supertest'
 import express from 'express'
 import { describe, it, expect, beforeEach, afterAll } from '@jest/globals'
 import { userRoutes } from '../../routes/users.js'
-import { User }  from '../../models/User.js';
+import { User }  from '../../db/models/user.js';
 
 // Create a new Express application
 const app = express()
