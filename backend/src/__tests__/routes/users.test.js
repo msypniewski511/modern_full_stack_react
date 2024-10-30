@@ -12,6 +12,11 @@ userRoutes(app)
 beforeEach(async () => {
   // Clear database before each test
   await User.deleteMany({});
+  await new Promise(resolve => setTimeout(resolve, 100)); // Delay to stabilize
+});
+
+beforeAll(async () => {
+  console.info('Starting tests, connecting to MongoDB at:', process.env.DATABASE_URL);
 });
 
 afterAll(async () => {
