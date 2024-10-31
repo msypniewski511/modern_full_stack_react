@@ -2,10 +2,18 @@
 
 import request from 'supertest'
 import express from 'express'
-import { describe, it, expect, beforeAll, afterEach, jest } from '@jest/globals'
+import {
+  describe,
+  it,
+  expect,
+  afterEach,
+  beforeEach,
+  jest,
+} from '@jest/globals'
 import { userRoutes } from '../../routes/users.js'
 import { postsRoutes } from '../../routes/posts.js'
 import { createPost } from '../../services/posts.js'
+import { Post } from '../../db/models/post.js'
 
 // Initialize express app and apply routes
 const app = express()
@@ -16,20 +24,20 @@ postsRoutes(app)
 describe('Posts Routes', () => {
   let token
 
-  beforeAll(async () => {
-    async function generateToken() {
-      const mockUser = { username: 'testuser', password: 'password' }
-      // First, create the user
-      await request(app).post('/api/v1/user/signup').send(mockUser)
+  async function generateToken() {
+    const mockUser = { username: 'testuser', password: 'password' }
+    await request(app).post('/api/v1/user/signup').send(mockUser)
+    const response = await request(app)
+      .post('/api/v1/user/login')
+      .send({ username: 'testuser', password: 'password' })
 
-      const response = await request(app)
-        .post('/api/v1/user/login')
-        .send({ username: 'testuser', password: 'password' })
+    return response.body.token
+  }
 
-      return await response.body.token
-    }
-
+  beforeEach(async () => {
     token = await generateToken()
+    await Post.deleteMany() // Clear posts
+    // Consider also clearing users if necessary
   })
 
   afterEach(() => {
@@ -41,7 +49,7 @@ describe('Posts Routes', () => {
     title: 'Sample Post',
     content: 'Test Content',
   }
-  let createdPostId
+  // let createdPostId
 
   // GET /api/v1/posts
   describe('GET /api/v1/posts', () => {
@@ -69,7 +77,7 @@ describe('Posts Routes', () => {
       const response = await request(app).get(`/api/v1/posts/${post._id}`)
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('title', samplePost.title)
-      createdPostId = post._id // Save the post ID for later tests
+      // createdPostId = post._id // Save the post ID for later tests
     })
 
     it('should return 404 if post is not found', async () => {
@@ -83,13 +91,14 @@ describe('Posts Routes', () => {
   // POST /api/v1/posts
   describe('POST /api/v1/posts', () => {
     it('should create a new post', async () => {
+      console.log(`---------------------${token}----------------------`)
       const response = await request(app)
         .post('/api/v1/posts')
         .set('Authorization', `Bearer ${token}`) // Set the token in the Authorization header
         .send(samplePost)
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('title', samplePost.title)
-      createdPostId = response.body._id // Save created post ID
+      // createdPostId = response.body._id // Save created post ID
     })
 
     it('should return 500 for invalid post data', async () => {
@@ -104,9 +113,14 @@ describe('Posts Routes', () => {
   // PATCH /api/v1/posts/:id
   describe('PATCH /api/v1/posts/:id', () => {
     it('should update an existing post', async () => {
+      const res = await request(app)
+        .post('/api/v1/posts')
+        .set('Authorization', `Bearer ${token}`) // Set the token in the Authorization header
+        .send(samplePost)
       const updatedData = { title: 'Updated Title' }
+
       const response = await request(app)
-        .patch(`/api/v1/posts/${createdPostId}`)
+        .patch(`/api/v1/posts/${res.body._id}`)
         .set('Authorization', `Bearer ${token}`)
         .send(updatedData)
       expect(response.status).toBe(200)
@@ -125,8 +139,12 @@ describe('Posts Routes', () => {
   // DELETE /api/v1/posts/:id
   describe('DELETE /api/v1/posts/:id', () => {
     it('should delete a post by id', async () => {
+      const res = await request(app)
+        .post('/api/v1/posts')
+        .set('Authorization', `Bearer ${token}`) // Set the token in the Authorization header
+        .send(samplePost)
       const response = await request(app)
-        .delete(`/api/v1/posts/${createdPostId}`)
+        .delete(`/api/v1/posts/${res.body._id}`)
         .set('Authorization', `Bearer ${token}`)
       expect(response.status).toBe(204)
     })
