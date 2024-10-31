@@ -1,4 +1,4 @@
-// src/test/jest.setup.js
+//src / test / jest.setup.js
 import { jest, beforeAll, afterAll } from '@jest/globals'
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
